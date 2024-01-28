@@ -1,0 +1,60 @@
+{% extends "network/layout.html" %}
+{% load static %}
+{% block head %}
+    <script src="{% static 'network/network.js' %}"></script>
+{% endblock head %}
+{% block body %}
+
+    <h2 id="title">{{ postTitle }}</h2>
+        <hr>
+    
+    <article id="posts">
+        {% if user.is_authenticated %}
+            <div class="containers">
+                <h4>New Post</h4>
+                <form id="newpost">
+                    {% csrf_token %}
+                    <textarea autofocus id="textareaPost" class="containersArea" 
+                        placeholder="Leave your post with atleast 15 characters except wrapped whitespaces."></textarea>
+                    <input type="submit" class="btn btn-primary" value="Post"/>
+                </form>
+                <div class="msg2" id="newpost_msg"> </div>
+            </div>
+        {% endif %}
+        {% for post in posts %}
+            <div class="containers">
+                <h4>{{ post.user }}</h4>
+                {% if user.is_authenticated %}
+                    <a href="#">Edit</a><a href="#">Delete</a>
+                {% endif %}
+                <p id="post_content-{{ post.id }}" class="post_content">{{ post.content }}</p>
+                <textarea id="textarea-{{ post.id }}" class="containersArea areaEdition"></textarea>
+                <div class="msg1">{{ post.timestamp }}</div>
+                <div class="like" title="like">♥<span class="msg1">{{ post.likes.count }}</span></div>
+                {% if user.is_authenticated %}
+                    <div class="msg1">Comment</div>
+                {% endif %}
+            </div>
+        {% endfor %}
+    </article>
+
+    <section id="profile">
+        {% if user.is_authenticated %}
+            {% for post in posts %}
+                {% if post.user == user %}
+                    <div class="containers">
+                        <h4>{{ post.user }}</h4>
+                        <a href="#">Edit</a><a href="#">Delete</a>
+                        <p id="post_content-{{ post.id }}" class="post_content">{{ post.content }}</p>
+                        <textarea id="textarea-{{ post.id }}" class="containersArea areaEdition"></textarea>
+                        <div class="msg1">{{ post.timestamp }}</div>
+                        <div class="like" title="like">♥<span class="msg1">{{ post.likes.count }}</span></div>
+                        <div class="msg1">Comment</div>
+                    </div>
+                {% endif %}
+            {% endfor %}
+        {% endif %}
+    </section>
+
+
+{% endblock %}

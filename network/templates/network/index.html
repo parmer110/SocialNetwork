@@ -1,0 +1,154 @@
+{% extends "network/layout.html" %}
+{% load static %}
+{% block head %}
+    <script src="{% static 'network/network.js' %}"></script>
+{% endblock head %}
+{% block body %}
+    {% comment %} Heading {% endcomment %}
+    <h2 id="title">{{ postTitle }}</h2><span id="profileTitle">{% if postTitle == "Profile" %}({{ current_user }}){% endif %}</span>
+        <hr>
+    <p>{{ message }}</p>
+
+    {% comment %} Post form {% endcomment %}
+    <article id="posts">
+        {% if user.is_authenticated %}
+            <div class="containers">
+                <h4>New Post</h4>
+                <form id="newpost">
+                    {% csrf_token %}
+                    <textarea autofocus id="textareaPost" class="containersArea" 
+                        placeholder="Leave your post with atleast 15 characters except wrapping whitespaces."></textarea>
+                    <input type="submit" class="btn btn-primary" value="Post"/>
+                </form>
+                <div class="msg2" id="newpost_msg" class="msg-animate"> </div>
+            </div>
+        {% endif %}
+    </article>
+
+    {% comment %} Profile items {% endcomment %}
+    <section id="profile">
+        <select name="following" class="btn btn-info follow_count">
+            <option value="">Following: {{ current_user.follower.count }}</option>
+            {% for u in current_user.follower.all %}
+            <option class="options" onclick="location.href='{% url 'profile' u.userTarget.id %}';">{{ u.userTarget }}</option>
+            {% endfor %}
+        </select>
+        <select name="followers" class="btn btn-info follow_count">
+            <option value="">Followers: {{ current_user.followed.count }}</option>
+            {% for u in current_user.followed.all %}
+            <option class="options" onclick="location.href='{% url 'profile' u.userPointer.id %}';">{{ u.userPointer }}</option>
+            {% endfor %}
+        </select>
+
+        {% if user.is_authenticated and current_user and user != current_user %}
+            <div 
+                class="{% if following %}btn btn-danger{% else %}btn btn-success{% endif %}" 
+                id="follow" onclick="location.href='{% url 'follow' current_user.id %}';">
+                {% if following %}Unfollow{% else %}Follow{% endif %}
+            </div>
+        {% endif %}
+    </section>
+
+    {% comment %} Posts messages {% endcomment %}
+    <div id="messages">
+        {% for post in posts %}
+            <div class="containers">
+                <h4 class="post_user" onclick="location.href='{% url 'profile' post.user.id %}';">{{ post.user }}</h4>
+                {% if post.user == user %}
+                    <button 
+                        data-textarea_id="textarea-{{ post.id }}"
+                        data-post_p_id="post_content-{{ post.id }}"
+                        data-edition_button_id="edition_post_button-{{ post.id }}"
+                        data-post_form_id="post_form-{{ post.id }}"
+                        data-post_id="{{ post.id }}"
+                        data-newpost_msg_eddition_id="newpost_msg_eddition-{{ post.id }}"
+                        value="edit"
+                        class="post_edit">Edit
+                    </button>
+                    <a href="#" style="display: none;">Delete</a>
+                {% endif %}
+                <p id="post_content-{{ post.id }}" class="preserve-whitespace post_content">{{ post.content }}</p>
+                <form id="post_form-{{ post.id }}">
+                    {% csrf_token %}
+                    <textarea id="textarea-{{ post.id }}" class="containersArea areaEdition"
+                    placeholder="Leave your post with atleast 15 characters except wrapping whitespaces."></textarea>
+                    <input id="edition_post_button-{{ post.id }}" type="submit" class="btn btn-primary edition_post_button" value="Save"/>
+                </form>
+                <div class="msg2 newpost_msg_eddition" id="newpost_msg_eddition-{{ post.id }}" class="msg-animate"></div>
+                <div class="msg1">{{ post.timestamp }}</div>
+                <div 
+                    data-post_id="{{ post.id }}" 
+                    data-like_count_id="like_count_id-{{ post.id }}"
+                    data-user_id="{{ post.user.id }}"
+                    class="like no" 
+                    title="like" 
+                    id="like-{{ post.id }}"
+                    >♥<span class="msg1" id="like_count_id-{{ post.id }}"></span>
+                    <script>
+                        like_count = 0;
+                    </script>
+                    {% for like in post.likes.all %}
+                        {% if like.likeUnlike %}
+                            <script>
+                                like_count++;
+                            </script>
+                        {% endif %}
+                        {% if like.user == user %}
+                            {% if like.likeUnlike %}
+                                <script>
+                                    document.querySelector('#like-{{ post.id }}').className = "like yes";
+                                </script>
+                            {% else %}
+                                <script>
+                                    document.querySelector('#like-{{ post.id }}').className = "like no";
+                                </script>
+                            {% endif %}
+                        {% endif %}
+                    {% endfor %}
+                    <script>
+                        document.querySelector('#like_count_id-{{ post.id }}').innerHTML = like_count;
+                    </script>
+                </div>
+                <div class="msg1" id="comment-{{ post.id }}">Comment</div>
+            </div>
+        {% endfor %}
+    </div>
+
+    {% comment %} Pagination {% endcomment %}
+    <div id="pagination">
+        <span class="step-links">
+            <nav aria-label="Page navigation example">
+                <ul class="pagination">
+                    {% if posts.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page=1" aria-label="First">
+                                <span aria-hidden="true">&laquo; first</span>
+                            </a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ posts.previous_page_number }}" aria-label="Previous">
+                                <span aria-hidden="true">previous</span>
+                            </a>
+                        </li>
+                    {% endif %}
+                    {% comment %} Current page {% endcomment %}
+                    <li class="page-item"><span class="page-link">
+                        Page {{ posts.number }} of {{ posts.paginator.num_pages }}.
+                    </span></li>
+                    {% if posts.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ posts.next_page_number }}" aria-label="Next">
+                            <span aria-hidden="true">next</span>
+                            </a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ posts.paginator.num_pages }}" aria-label="Last">
+                            <span aria-hidden="true">last &raquo;</span>
+                            </a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </span>
+    </div>
+{% endblock %}

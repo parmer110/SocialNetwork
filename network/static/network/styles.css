@@ -1,0 +1,119 @@
+body {
+    margin: 10px;
+}
+a {
+    cursor: pointer;
+}
+
+header {
+    position: fixed;
+    top:0%;
+    width: 100%;
+}
+
+#title {
+    font-weight: bold;
+    font-family: sans-serif;
+    display: inline;
+}
+
+.containers {
+    border: thin solid silver;
+    font-family: sans-serif;
+    padding: 20px;
+    margin-bottom: 5px;
+}
+.containers textarea {
+    padding: 2px;
+}
+.containers a {
+    border: solid 1px;
+    margin-right: 20px;
+    padding: 2px;
+}
+.containersArea {
+    width: 100%;
+    font-family: sans-serif;
+    font-weight: lighter;
+}
+/* .areaEdition {
+    display: none;
+} */
+@keyframes text_show {
+    from {
+        left: calc(100% - 200px);
+        opacity: 0;
+    }
+    to {
+        left: 0%;
+        opacity: 1;
+    }
+}
+#newpost_msg {
+    position: relative;
+    animation-name: text_show;
+    animation-duration: 0.2s;
+    animation-fill-mode: forwards;
+}
+.newpost_msg_eddition {
+    position: relative;
+    animation-name: text_show;
+    animation-duration: 0.2s;
+    animation-fill-mode: forwards;
+}
+
+.msg0 {
+    font-family: sans-serif;
+    font-size: 12px;
+    color: black;
+}
+.msg1 {
+    font-family: sans-serif;
+    font-size: 18px;
+    color: rgb(109, 109, 109);
+}
+.msg2 {
+    font-family: sans-serif;
+    font-size: 18px;
+    color: rgb(107, 107, 107);
+}
+
+.like {
+    width: fit-content;
+    font-size: 32px;
+    font-weight: bolder;
+    cursor: pointer;
+}
+.like.no {
+    color: black;
+}
+.like.yes {
+    color: red;
+}
+
+.post_user {
+    cursor: pointer;
+    width: fit-content;
+}
+
+#profileTitle{
+    color: green;
+    font-family: sans-serif;
+    font-weight: bold;
+}
+
+#follow{
+    cursor: pointer;
+    width: fit-content;
+    display: block;
+    margin: 8px;
+}
+
+.options {
+    cursor: pointer;
+}
+
+.preserve-whitespace {
+    white-space: pre-line;
+    
+}
